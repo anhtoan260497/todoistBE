@@ -1,4 +1,5 @@
 const accountModel = require("../models/account");
+const jwt = require("jsonwebtoken");
 
 class AccountController {
   getAll(req, res) {
@@ -44,23 +45,36 @@ class AccountController {
   }
 
   login(req, res) {
-    const username = req.body.username;
+    const email = req.body.email;
     const password = req.body.password;
     accountModel
       .findOne({
-        username,
+        email,
         password,
       })
       .then((data) => {
         if (data) {
-          res.json("Đăng nhập thành công");
+          const _id = { _id: email };
+          const token = jwt.sign(_id, process.env.JWT_PASSWORD, {
+            expiresIn: 900,
+          });
+          res.json({
+            token,
+            loggedIn: true,
+          });
           return;
         }
-        res.status(400).json("Đăng nhập thất bại");
+        res.status(400).json({
+          loggedIn: false,
+          status: "Wrong username or password",
+        });
         return;
       })
       .catch((err) => {
-        res.status(500).json("Có lỗi bên Server");
+        res.status(500).json({
+          loggedIn: false,
+          status: "Server errror",
+        });
       });
   }
 
