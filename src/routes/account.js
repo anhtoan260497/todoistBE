@@ -7,6 +7,7 @@ router.get('/',accountController.getAll)
 router.get("/:id", accountController.getOne);
 router.post("/create", accountController.create);
 router.post("/login", accountController.login);
+router.post('/logged',accountController.loggedIn)
 router.put("/:id", accountController.update);
 router.delete("/:id", accountController.delete);
 
