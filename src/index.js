@@ -6,6 +6,8 @@ const routes = require('./routes')
 // db connect
 connectDB.connect()
 
+require('dotenv').config()
+
 const port = 8080
 
 
@@ -17,6 +19,8 @@ app.use(express.urlencoded({
 
 // routes 
 routes(app)
+
+
 
 app.get('/',(req,res) => {
     res.send('hello')
