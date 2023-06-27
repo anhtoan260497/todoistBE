@@ -100,6 +100,22 @@ class AccountController {
       .then((date) => res.json("Xoá thành công"))
       .catch((err) => res.status(500).json("Lỗi server"));
   }
+
+  loggedIn(req, res, next) {
+    const token = req.body.token;
+    try {
+      const i = jwt.verify(token, process.env.JWT_PASSWORD);
+      res.json({
+        loggedIn: true,
+      });
+    } catch (err) {
+      res.status(401).json({
+        loggedIn: false,
+        status: "Unauthorized",
+      });
+    }
+    next()
+  }
 }
 
 module.exports = new AccountController();
