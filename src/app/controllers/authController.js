@@ -1,14 +1,17 @@
 const accountModel = require("../models/account");
 const jwt = require("jsonwebtoken");
-const passport = require("passport");
-const Local = require("passport-local");
 
-class AccountController {
+class AuthController {
   getAll(req, res) {
     accountModel
       .find({})
       .then((data) => res.json(data))
-      .catch((err) => res.status(500).json("Lỗi server"));
+      .catch((err) =>
+        res.status(500).json({
+          status: 500,
+          message: "Server Error",
+        })
+      );
   }
 
   getOne(req, res) {
@@ -18,35 +21,52 @@ class AccountController {
         _id: id,
       })
       .then((data) => res.json(data))
-      .catch((err) => res.status(500).json("Lỗi server"));
+      .catch((err) =>
+        res.status(500).json({
+          status: 500,
+          message: "Server Error",
+        })
+      );
   }
 
   create(req, res) {
-    const username = req.body.username;
+    const email = req.body.email;
     const password = req.body.password;
 
     accountModel
       .findOne({
-        username,
+        email,
       })
       .then((data) => {
         if (data) {
-          res.status(500).json("user da ton tai");
+          res.status(500).json({
+            status: 500,
+            message: "Existing account. Please choose another",
+          });
           return;
         }
         return accountModel
           .create({
-            username,
+            email,
             password,
           })
-          .then((data) => res.json("tao tai khoan thanh cong"));
+          .then(() =>
+            res.json({
+              status: 200,
+              message: "Create new account success",
+            })
+          );
       })
-      .catch((err) => res.status(500).json("tao tai khoan that bai"));
-    //   .then((data) => res.json("tao tai khoan thanh cong"))
-    //   .catch((err) => res.status(500).json("tao tai khoan that bai"))
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+          status: 500,
+          message: "Failed. Please try again later",
+        });
+      });
   }
 
-  login(req, res, next) { 
+  login(req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
     accountModel
@@ -99,8 +119,18 @@ class AccountController {
       .deleteOne({
         _id: id,
       })
-      .then((date) => res.json("Xoá thành công"))
-      .catch((err) => res.status(500).json("Lỗi server"));
+      .then((date) =>
+        res.json({
+          status: 200,
+          message: "Success",
+        })
+      )
+      .catch((err) =>
+        res.status(500).json({
+          status: 500,
+          message: "Server Error",
+        })
+      );
   }
 
   loggedIn(req, res, next) {
@@ -120,4 +150,4 @@ class AccountController {
   }
 }
 
-module.exports = new AccountController();
+module.exports = new AuthController();
