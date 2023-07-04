@@ -3,7 +3,6 @@ const app = express();
 const connectDB = require("./config/database/connectDB");
 const routes = require("./routes");
 const cookies =  require('cookie-parser');
-const passport = require("passport");
 
 
 // db connect
@@ -27,12 +26,7 @@ app.use((req, res, next) => {
 
 // use
 app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
-
+app.use(express.urlencoded({ extended: true }));
 app.use(cookies())
 
 
