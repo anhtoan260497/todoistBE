@@ -1,7 +1,7 @@
-const accountRouters = require('./account')
+const authRouters = require('./auth')
 
 const routes = (app) => {
-    app.use('/api/account', accountRouters)
+    app.use('/api/auth', authRouters)
 }
 
 module.exports = routes

@@ -1,5 +1,7 @@
 const accountModel = require("../models/account");
 const jwt = require("jsonwebtoken");
+const passport = require("passport");
+const Local = require("passport-local");
 
 class AccountController {
   getAll(req, res) {
@@ -44,7 +46,7 @@ class AccountController {
     //   .catch((err) => res.status(500).json("tao tai khoan that bai"))
   }
 
-  login(req, res) {
+  login(req, res, next) { 
     const email = req.body.email;
     const password = req.body.password;
     accountModel
@@ -114,7 +116,7 @@ class AccountController {
         status: "Unauthorized",
       });
     }
-    next()
+    next();
   }
 }
 
