@@ -2,7 +2,9 @@ const express = require("express");
 const app = express();
 const connectDB = require("./config/database/connectDB");
 const routes = require("./routes");
-const cookies =  require('cookie-parser')
+const cookies =  require('cookie-parser');
+const passport = require("passport");
+
 
 // db connect
 connectDB.connect();
@@ -15,7 +17,7 @@ const port = 8080;
 
 //CORS Enable
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
   res.header("Access-Control-Allow-Headers", "Content-type");
   next();
@@ -30,7 +32,9 @@ app.use(
     extended: true,
   })
 );
+
 app.use(cookies())
+
 
 // routes
 routes(app);
