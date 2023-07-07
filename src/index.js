@@ -9,7 +9,7 @@ const cookies =  require('cookie-parser');
 connectDB.connect();
 
 //env dotENV
-require("dotenv").config();
+require('dotenv').config({path: './.env'});
 
 //port
 const port = 8080;
