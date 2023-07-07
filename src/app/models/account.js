@@ -6,7 +6,8 @@ const accountSchema = new Schema({
     email : String,
     password : String,
 },{
-    collection : 'Accounts'
+    collection : 'Accounts',
+    timestamps : true
 }) 
 
 const accountModel = mongoose.model('account',accountSchema)

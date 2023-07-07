@@ -3,6 +3,7 @@ const router = express.Router();
 const authController = require("../app/controllers/authController");
 
 router.post("/create", authController.create);
+router.get('/all',authController.getAll)
 router.post("/login", authController.login);
 router.post('/logged',authController.loggedIn)
 router.get("/:id", authController.getOne);
