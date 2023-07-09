@@ -80,6 +80,7 @@ class AuthController {
           const token = jwt.sign(_id, process.env.JWT_PASSWORD, {
             expiresIn: 900,
           });
+          console.log(token)
           res.json({
             token,
             loggedIn: true,
