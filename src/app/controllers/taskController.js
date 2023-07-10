@@ -24,7 +24,7 @@ class TaskController {
       });
   }
 
-  updateTask(req, res) {
+  updateProject(req, res) {
     const bearerToken = req.header("authorization");
     if (!bearerToken) return res.status.json({ loggedIn: false });
     const token = removeBearer(bearerToken);
@@ -34,12 +34,11 @@ class TaskController {
         loggedIn: false,
       });
     const email = user._id;
-    console.log(req.body.tasks);
     taskModel
       .updateOne(
         { email },
         {
-          tasks: req.body.tasks,
+          projects: req.body.projects,
         }
       )
       .then(() => {
@@ -51,7 +50,7 @@ class TaskController {
       .catch((err) => res.status(500).json("Server Error"));
   }
 
-  getTaskWithFilter(req, res) {
+  getTaskWithFilters(req, res) {
     const bearerToken = req.header("authorization");
     if (!bearerToken) return res.status.json({ loggedIn: false });
     const token = removeBearer(bearerToken);
@@ -66,7 +65,9 @@ class TaskController {
       .then((data) => {
         const now = Date.now();
         const currentDay = getTime(now);
-        const todayTask = data.tasks.filter((item) => {
+        const allProjects = data.projects.map(item => [...item.tasks])
+        const allTasks = allProjects.flat(1) // merge all nested array to single array
+        const todayTask = allTasks.filter((item) => {
           const taskDate = getTime(item.date);
           if (
             taskDate.date === currentDay.date &&
@@ -76,15 +77,15 @@ class TaskController {
             return true;
           return false;
         });
-        const overdueTask = data.tasks.filter(item => {
+        const overdueTask = allTasks.filter(item => {
           const taskDate = getTime(item.date);
           if(item.date < now && taskDate.date < currentDay.date ) return true
           return false
         })
 
-        const upcomingTask = data.tasks.filter(item => {
+        const upcomingTask = allTasks.filter(item => {
           const taskDate = getTime(item.date);
-          if(item.date > now && taskDate.date > currentDay.date ) return true
+          if(item.date > now ) return true
           return false
         })
         res.json({
@@ -94,7 +95,10 @@ class TaskController {
         });
         
       })
-      .catch((err) => res.status(500).json("server error"));
+      .catch((err) => {
+        console.log(err)
+        res.status(500).json("server error")
+      });
   }
 }
 
