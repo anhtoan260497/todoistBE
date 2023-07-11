@@ -3,6 +3,7 @@ const app = express();
 const connectDB = require("./config/database/connectDB");
 const routes = require("./routes");
 const cookies =  require('cookie-parser');
+const  cors = require('cors')
 
 
 // db connect
@@ -15,12 +16,21 @@ require('dotenv').config({path: './.env'});
 const port = 8080;
 
 //CORS Enable
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
-  res.header("Access-Control-Allow-Headers", "Content-type");
-  next();
-});
+
+app.use(cors())
+
+// app.use((req, res, next) => {
+//   const allowedOrigins = ['http://127.0.0.1:3000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3000'];
+//   const origin = req.headers.origin;
+//   if (allowedOrigins.includes(origin)) {
+//        res.setHeader('Access-Control-Allow-Origin', origin);
+//   }
+//   //res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:8020');
+//   res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   res.header('Access-Control-Allow-Credentials', true);
+//   return next();
+// });
 
 
 

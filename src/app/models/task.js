@@ -26,17 +26,24 @@ const taskSchema = new Schema(
             },
             subTask: [
               {
-                label: String,
-                isDone: Boolean,
+                title: {
+                  type : String,
+                  required : true,
+                },
+                description : String,
+                isDone: {
+                  type : Boolean,
+                  required : true
+                },
               },
             ],
             comments: [
               {
-                label: {
+                title: {
                   type: String,
                   required: true,
                 },
-                timestamps: {
+                timestamp: {
                   type: Number,
                   required: true,
                 },

@@ -6,7 +6,7 @@ const taskModel = require("../models/task");
 class TaskController {
   getAllTask(req, res) {
     const bearerToken = req.header("authorization");
-    if (!bearerToken) return res.status.json({ loggedIn: false });
+    if (!bearerToken) return res.status(401).json({ loggedIn: false });
     const token = removeBearer(bearerToken);
     const user = checkJWT(token);
     if (!user)
@@ -24,9 +24,9 @@ class TaskController {
       });
   }
 
-  updateProject(req, res) {
+  updateTask(req, res) {
     const bearerToken = req.header("authorization");
-    if (!bearerToken) return res.status.json({ loggedIn: false });
+    if (!bearerToken) return res.status(401).json({ loggedIn: false });
     const token = removeBearer(bearerToken);
     const user = checkJWT(token);
     if (!user)
@@ -65,8 +65,8 @@ class TaskController {
       .then((data) => {
         const now = Date.now();
         const currentDay = getTime(now);
-        const allProjects = data.projects.map(item => [...item.tasks])
-        const allTasks = allProjects.flat(1) // merge all nested array to single array
+        const allProjects = data.projects.map((item) => [...item.tasks]);
+        const allTasks = allProjects.flat(1); // merge all nested array to single array
         const todayTask = allTasks.filter((item) => {
           const taskDate = getTime(item.date);
           if (
@@ -77,29 +77,73 @@ class TaskController {
             return true;
           return false;
         });
-        const overdueTask = allTasks.filter(item => {
+        const overdueTask = allTasks.filter((item) => {
           const taskDate = getTime(item.date);
-          if(item.date < now && taskDate.date < currentDay.date ) return true
-          return false
-        })
-
-        const upcomingTask = allTasks.filter(item => {
-          const taskDate = getTime(item.date);
-          if(item.date > now ) return true
-          return false
-        })
-        res.json({
-          today : todayTask,
-          overdue : overdueTask,
-          upcoming : upcomingTask
+          if (item.date < now && taskDate.date < currentDay.date) return true;
+          return false;
         });
-        
+
+        const upcomingTask = allTasks.filter((item) => {
+          const taskDate = getTime(item.date);
+          if (item.date > now) return true;
+          return false;
+        });
+
+        res.json({
+          today: todayTask,
+          overdue: overdueTask,
+          upcoming: upcomingTask,
+        });
       })
       .catch((err) => {
-        console.log(err)
-        res.status(500).json("server error")
+        console.log(err);
+        res.status(500).json("server error");
       });
   }
+
+  removeTaskWithTaskId(req, res) {
+    const bearerToken = req.header("authorization");
+    if (!bearerToken) return res.status(401).json({ loggedIn: false });
+    const token = removeBearer(bearerToken);
+    const user = checkJWT(token);
+    if (!user)
+      return res.status(401).json({
+        loggedIn: false,
+      });
+    const email = user._id;
+    console.log(req.body.projectName);
+    const projectName = req.body.projectName;
+    const _id = req.body._id;
+    taskModel
+      .findOne({
+        email,
+      })
+      .then((data) => {
+        const cloneData = JSON.parse(JSON.stringify(data));
+        const projectIndex = data.projects.findIndex(
+          (item) => item.title === projectName
+        );
+        const taskIndex = data.projects[projectIndex].tasks.findIndex(
+          (item) => _id === item._id.toString()
+        );
+        cloneData.projects[projectIndex].tasks.splice(taskIndex, 1);
+        taskModel
+          .updateOne(
+            { email },
+            {
+              projects: cloneData.projects,
+            }
+          )
+          .then(() => {
+            taskModel
+              .findOne({ email })
+              .then((data) => res.json(data))
+              .catch((err) => res.status(500).json("Server Error"));
+          })
+          .catch((err) => res.status(500).json("Server Error"));
+      });
+  } //require projectName && task _id
+
 }
 
 module.exports = new TaskController();
