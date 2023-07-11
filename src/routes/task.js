@@ -3,7 +3,8 @@ const router = express.Router();
 const taskController = require("../app/controllers/taskController");
 
 router.post('/',taskController.getAllTask)
-router.post('/update',taskController.updateProject)
+router.post('/update',taskController.updateTask)
 router.post('/filter',taskController.getTaskWithFilters)
+router.post('/removeWithId',taskController.removeTaskWithTaskId)
 
 module.exports = router;
