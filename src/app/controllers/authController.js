@@ -1,3 +1,5 @@
+const checkJWT = require("../../helper/checkJWT");
+const removeBearer = require("../../helper/removeBearer");
 const accountModel = require("../models/account");
 const jwt = require("jsonwebtoken");
 
@@ -80,7 +82,7 @@ class AuthController {
           const token = jwt.sign(_id, process.env.JWT_PASSWORD, {
             expiresIn: 900,
           });
-          console.log(token)
+          console.log(token);
           res.json({
             token,
             loggedIn: true,
@@ -135,18 +137,38 @@ class AuthController {
   }
 
   loggedIn(req, res, next) {
-    const token = req.body.token;
-    try {
-      const i = jwt.verify(token, process.env.JWT_PASSWORD);
-      res.json({
-        loggedIn: true,
+    const bearerToken = req.header("authorization");
+    if (!bearerToken) return res.status(401).json({ loggedIn: false });
+    const token = removeBearer(bearerToken);
+    const user = checkJWT(token);
+    if (user) {
+      const token = jwt.sign({_id : user._id}, process.env.JWT_PASSWORD, {
+        expiresIn: 900,
       });
-    } catch (err) {
-      res.status(401).json({
-        loggedIn: false,
-        status: "Unauthorized",
-      });
+      return res.json({
+        token,
+        loggedIn : true
+      })
     }
+
+    res.status(401).json({
+      loggedIn: false,
+      status: "Unauthorized",
+    });
+
+    // try {
+    //   const data = jwt.verify(token, process.env.JWT_PASSWORD);
+    //   console.log('hi',data)
+    //   res.json({
+    //     loggedIn: true,
+    //   });
+
+    // } catch (err) {
+    //   res.status(401).json({
+    //     loggedIn: false,
+    //     status: "Unauthorized",
+    //   });
+    // }
     next();
   }
 }

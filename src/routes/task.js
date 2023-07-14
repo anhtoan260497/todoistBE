@@ -5,6 +5,6 @@ const taskController = require("../app/controllers/taskController");
 router.post('/',taskController.getAllTask)
 router.post('/update',taskController.updateTask)
 router.post('/filter',taskController.getTaskWithFilters)
-router.post('/removeWithId',taskController.removeTaskWithTaskId)
+router.post('/remove',taskController.removeTaskWithTaskId)
 
 module.exports = router;

@@ -37,27 +37,10 @@ const taskSchema = new Schema(
                 },
               },
             ],
-            comments: [
-              {
-                title: {
-                  type: String,
-                  required: true,
-                },
-                timestamp: {
-                  type: Number,
-                  required: true,
-                },
-                description: {
-                  type: String,
-                  required: true,
-                },
-              },
-            ],
             priority: {
               type : Number,
               required : true
             },
-            labels: [],
             project: {
               type : String,
               required : true
