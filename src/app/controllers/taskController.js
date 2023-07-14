@@ -111,7 +111,6 @@ class TaskController {
         loggedIn: false,
       });
     const email = user._id;
-    console.log(req.body.projectName);
     const projectName = req.body.projectName;
     const _id = req.body._id;
     taskModel
@@ -123,6 +122,7 @@ class TaskController {
         const projectIndex = data.projects.findIndex(
           (item) => item.title === projectName
         );
+        if(projectIndex < 0 ) return
         const taskIndex = data.projects[projectIndex].tasks.findIndex(
           (item) => _id === item._id.toString()
         );
