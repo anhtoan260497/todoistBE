@@ -70,7 +70,7 @@ class ProjectController {
         const projectIdx = cloneProjects.findIndex(
           (item) => item.title === project.oldProject || item.title === project.project
         );
-        console.log(projectIdx)
+
         const taskIndex = cloneProjects[projectIdx].tasks.findIndex(
           (item) => project._id === item._id.toString()
         );
@@ -79,7 +79,9 @@ class ProjectController {
           (item) => item.title === project.project
         );
         cloneProjects[projectIdxNew].tasks.push(project);
-        console.log(cloneProjects[projectIdx].tasks);
+        cloneProjects[projectIdxNew].tasks.sort((item1,item2) => {
+          return item1.date-item2.date
+        });
 
         taskModel
           .updateOne(

@@ -77,14 +77,21 @@ class TaskController {
             return true;
           return false;
         });
+
         const overdueTask = allTasks.filter((item) => {
           const taskDate = getTime(item.date);
-          if (item.date < now && taskDate.date < currentDay.date) return true;
+          if (
+            item.date < now &&
+            (taskDate.date !== currentDay.date ||
+              taskDate.month !== currentDay.month ||
+              taskDate.year ||
+              currentDay.year)
+          )
+            return true;
           return false;
         });
 
         const upcomingTask = allTasks.filter((item) => {
-          const taskDate = getTime(item.date);
           if (item.date > now) return true;
           return false;
         });
@@ -122,7 +129,7 @@ class TaskController {
         const projectIndex = data.projects.findIndex(
           (item) => item.title === projectName
         );
-        if(projectIndex < 0 ) return
+        if (projectIndex < 0) return;
         const taskIndex = data.projects[projectIndex].tasks.findIndex(
           (item) => _id === item._id.toString()
         );
@@ -144,6 +151,51 @@ class TaskController {
       });
   } //require projectName && task _id
 
+  addSubTask(req, res) {
+    const bearerToken = req.header("authorization");
+    if (!bearerToken) return res.status(401).json({ loggedIn: false });
+    const token = removeBearer(bearerToken);
+    const user = checkJWT(token);
+    if (!user)
+      return res.status(401).json({
+        loggedIn: false,
+      });
+    const email = user._id;
+    const body = req.body;
+    const project = req.body.project;
+    const _id = req.body._id;
+    const newSubTask = JSON.parse(req.body.newSubTask);
+    taskModel
+      .findOne({
+        email,
+      })
+      .then((data) => {
+        const projectIdx = data.projects.findIndex(
+          (item) => item.title === project
+        );
+        const cloneData = {...data.toObject()};
+        const cloneProjectData = cloneData.projects[projectIdx];
+        const taskIdx = cloneProjectData.tasks.findIndex(
+          (item) => item._id.toString() === _id
+        );
+        cloneProjectData.tasks[taskIdx].subTask.push(newSubTask);
+        taskModel
+          .updateOne(
+            {
+              email,
+            },
+            {
+              projects: cloneData.projects,
+            }
+          )
+          .then(() => {
+            taskModel
+              .findOne({ email })
+              .then((data) => res.json(data))
+              .catch((err) => res.status(500).json("Server Error"));
+          });
+      });
+  }
 }
 
 module.exports = new TaskController();
