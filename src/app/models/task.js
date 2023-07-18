@@ -47,6 +47,7 @@ const taskSchema = new Schema(
             },
           },
         ],
+        color : String,
       },
     ],
   },

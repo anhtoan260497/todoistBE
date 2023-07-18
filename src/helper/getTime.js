@@ -2,7 +2,7 @@ const getTime = (timestamp ) => {
     const date = new Date(timestamp)
     return {
         date : date.getDate(),
-        month : date.getMonth(),
+        month : date.getMonth() + 1,
         year : date.getFullYear()
     }
 }
