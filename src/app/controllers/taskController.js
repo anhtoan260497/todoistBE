@@ -24,6 +24,37 @@ class TaskController {
       });
   }
 
+  addTask(req, res) {
+    const bearerToken = req.header("authorization");
+    if (!bearerToken) return res.status(401).json({ loggedIn: false });
+    const token = removeBearer(bearerToken);
+    const user = checkJWT(token);
+    if (!user)
+      return res.status(401).json({
+        loggedIn: false,
+      });
+    const email = user._id;
+    const newTask = req.body.newTask;
+    const project = req.body.project;
+    const projectId = req.body.projectId;
+    taskModel.findOne({ email }).then((data) => {
+      const cloneData = { ...data.toObject() };
+      const projectIdx = cloneData.projects.findIndex(
+        (item) => item.title === project && item._id.toString() === projectId
+      );
+      cloneData.projects[projectIdx].tasks.push(newTask);
+      console.log(cloneData);
+      taskModel
+        .updateOne({ email }, { projects: cloneData.projects })
+        .then(() => {
+          taskModel
+            .findOne({ email })
+            .then((data) => res.json(data))
+            .catch((err) => res.status(500).json("Server Error"));
+        });
+    });
+  }
+
   updateTask(req, res) {
     const bearerToken = req.header("authorization");
     if (!bearerToken) return res.status(401).json({ loggedIn: false });
@@ -70,9 +101,11 @@ class TaskController {
         const todayTask = allTasks.filter((item) => {
           const taskDate = getTime(item.date);
           if (
-            taskDate.date === currentDay.date &&
-            taskDate.month === currentDay.month &&
-            taskDate.year === currentDay.year
+            item.date === now ||
+            (item.date < now &&
+              taskDate.date === currentDay.date &&
+              taskDate.month === currentDay.month &&
+              taskDate.year === currentDay.year)
           )
             return true;
           return false;
@@ -80,12 +113,12 @@ class TaskController {
 
         const overdueTask = allTasks.filter((item) => {
           const taskDate = getTime(item.date);
+          console.log("overdue", taskDate.month !== currentDay.month);
           if (
             item.date < now &&
             (taskDate.date !== currentDay.date ||
               taskDate.month !== currentDay.month ||
-              taskDate.year ||
-              currentDay.year)
+              taskDate.year !== currentDay.year)
           )
             return true;
           return false;
@@ -151,7 +184,7 @@ class TaskController {
       });
   } //require projectName && task _id
 
-  addSubTask(req, res) {
+  updateSubTask(req, res) {
     const bearerToken = req.header("authorization");
     if (!bearerToken) return res.status(401).json({ loggedIn: false });
     const token = removeBearer(bearerToken);
@@ -161,10 +194,9 @@ class TaskController {
         loggedIn: false,
       });
     const email = user._id;
-    const body = req.body;
     const project = req.body.project;
     const _id = req.body._id;
-    const newSubTask = JSON.parse(req.body.newSubTask);
+    const subtask = req.body.newSubTask;
     taskModel
       .findOne({
         email,
@@ -173,12 +205,12 @@ class TaskController {
         const projectIdx = data.projects.findIndex(
           (item) => item.title === project
         );
-        const cloneData = {...data.toObject()};
+        const cloneData = { ...data.toObject() };
         const cloneProjectData = cloneData.projects[projectIdx];
         const taskIdx = cloneProjectData.tasks.findIndex(
           (item) => item._id.toString() === _id
         );
-        cloneProjectData.tasks[taskIdx].subTask.push(newSubTask);
+        cloneProjectData.tasks[taskIdx].subTask = subtask;
         taskModel
           .updateOne(
             {
