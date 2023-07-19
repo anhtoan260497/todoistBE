@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const dbUrl = `mongodb+srv://anhtoan260497:Elfenlied1997@mongodbserver.yczihny.mongodb.net/todoistBE`
+const dbUrl = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@mongodbserver.yczihny.mongodb.net/todoistBE`
 const localhostUrl = `mongodb://127.0.0.1:27017/todolist`
 
 const connect = async () => {
