@@ -43,14 +43,13 @@ class TaskController {
         (item) => item.title === project && item._id.toString() === projectId
       );
       cloneData.projects[projectIdx].tasks.push(newTask);
-      console.log(cloneData);
       taskModel
         .updateOne({ email }, { projects: cloneData.projects })
         .then(() => {
           taskModel
             .findOne({ email })
             .then((data) => res.json(data))
-            .catch((err) => res.status(500).json("Server Error"));
+            .catch((err) => res.status(500).json("Server Error"))
         });
     });
   }
@@ -113,7 +112,6 @@ class TaskController {
 
         const overdueTask = allTasks.filter((item) => {
           const taskDate = getTime(item.date);
-          console.log("overdue", taskDate.month !== currentDay.month);
           if (
             item.date < now &&
             (taskDate.date !== currentDay.date ||
