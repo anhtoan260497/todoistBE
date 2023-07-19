@@ -10,7 +10,7 @@ const  cors = require('cors')
 connectDB.connect();
 
 //env dotENV
-require('dotenv').config();
+require("dotenv").config()
 
 //port
 const port = 8080;
