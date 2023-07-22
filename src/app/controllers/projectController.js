@@ -68,7 +68,8 @@ class ProjectController {
         const cloneProjects = [...data.projects];
 
         const projectIdx = cloneProjects.findIndex(
-          (item) => item.title === project.oldProject || item.title === project.project
+          (item) =>
+            item.title === project.oldProject || item.title === project.project
         );
 
         const taskIndex = cloneProjects[projectIdx].tasks.findIndex(
@@ -79,8 +80,8 @@ class ProjectController {
           (item) => item.title === project.project
         );
         cloneProjects[projectIdxNew].tasks.push(project);
-        cloneProjects[projectIdxNew].tasks.sort((item1,item2) => {
-          return item1.date-item2.date
+        cloneProjects[projectIdxNew].tasks.sort((item1, item2) => {
+          return item1.date - item2.date;
         });
 
         taskModel
@@ -101,8 +102,56 @@ class ProjectController {
           );
       })
       .catch((err) => {
-        console.log(err)
-        res.status(500).json("Error")
+        console.log(err);
+        res.status(500).json("Error");
+      });
+  }
+
+  addProject(req, res) {
+    const bearerToken = req.header("authorization");
+    if (!bearerToken) return res.status(401).json({ loggedIn: false });
+    const token = removeBearer(bearerToken);
+    const user = checkJWT(token);
+    if (!user)
+      return res.status(401).json({
+        loggedIn: false,
+      });
+    const email = user._id;
+    const project = req.body.project;
+    const color = req.body.color;
+    taskModel
+      .findOne({
+        email,
+      })
+      .then((data) => {
+        const idx = data.projects.findIndex((item) => item.title === project);
+        if (idx >= 0) {
+          return res.status(500).json({
+            error: true,
+            status: "Project name has exist",
+          });
+        }
+
+        const newProject = {
+          title: project,
+          tasks: [],
+          color
+        };
+
+        const newProjects = [...data.projects,newProject]
+        console.log(newProject)
+
+        taskModel
+          .updateOne({ email }, { projects: newProjects})
+          .then(() => {
+            taskModel
+              .findOne({ email })
+              .then((data) => {
+                console.log(data)
+                res.json(data)
+              })
+              .catch((err) => res.status(500).json("Error"));
+          });
       });
   }
 }

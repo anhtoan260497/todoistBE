@@ -1,6 +1,7 @@
 const checkJWT = require("../../helper/checkJWT");
 const removeBearer = require("../../helper/removeBearer");
 const accountModel = require("../models/account");
+const taskModel = require("../models/task");
 const jwt = require("jsonwebtoken");
 
 class AuthController {
@@ -52,12 +53,26 @@ class AuthController {
             email,
             password,
           })
-          .then(() =>
-            res.json({
-              status: 200,
-              message: "Create new account success",
-            })
-          );
+          .then(() => {
+            taskModel
+              .create({
+                email,
+                password,
+                projects: [],
+              })
+              .then(() =>
+                res.json({
+                  status: 200,
+                  message: "Create new account success",
+                })
+              )
+              .catch((err) =>
+                res.status(500).json({
+                  status: 500,
+                  message: "Failed. Please try again later",
+                })
+              );
+          });
       })
       .catch((err) => {
         console.log(err);
@@ -71,6 +86,7 @@ class AuthController {
   login(req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
+    console.log(email, typeof password);
     accountModel
       .findOne({
         email,
@@ -89,6 +105,7 @@ class AuthController {
           });
           return;
         }
+        console.log(data);
         res.status(400).json({
           loggedIn: false,
           status: "Wrong username or password",
@@ -142,13 +159,13 @@ class AuthController {
     const token = removeBearer(bearerToken);
     const user = checkJWT(token);
     if (user) {
-      const token = jwt.sign({_id : user._id}, process.env.JWT_PASSWORD, {
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_PASSWORD, {
         expiresIn: 900,
       });
       return res.json({
         token,
-        loggedIn : true
-      })
+        loggedIn: true,
+      });
     }
 
     res.status(401).json({
