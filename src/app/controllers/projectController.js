@@ -135,24 +135,57 @@ class ProjectController {
         const newProject = {
           title: project,
           tasks: [],
-          color
+          color,
         };
 
-        const newProjects = [...data.projects,newProject]
-        console.log(newProject)
+        const newProjects = [...data.projects, newProject];
+        console.log(newProject);
 
-        taskModel
-          .updateOne({ email }, { projects: newProjects})
-          .then(() => {
-            taskModel
-              .findOne({ email })
-              .then((data) => {
-                console.log(data)
-                res.json(data)
-              })
-              .catch((err) => res.status(500).json("Error"));
-          });
+        taskModel.updateOne({ email }, { projects: newProjects }).then(() => {
+          taskModel
+            .findOne({ email })
+            .then((data) => {
+              console.log(data);
+              res.json(data);
+            })
+            .catch((err) => res.status(500).json("Error"));
+        });
       });
+  }
+
+  deleteProject(req, res) {
+    const bearerToken = req.header("authorization");
+    if (!bearerToken) return res.status(401).json({ loggedIn: false });
+    const token = removeBearer(bearerToken);
+    const user = checkJWT(token);
+    if (!user)
+      return res.status(401).json({
+        loggedIn: false,
+      });
+    const email = user._id;
+    const project = req.body.project;
+    taskModel.findOne({ email }).then((data) => {
+      const idx = data.projects.findIndex((item) => item.title === project);
+      const cloneProject = { ...data.toObject() };
+      cloneProject.projects.splice(idx, 1);
+      taskModel
+        .updateOne(
+          { email },
+          {
+            projects: cloneProject.projects,
+          }
+        )
+        .then(() => {
+          taskModel
+            .findOne({ email })
+            .then((data) => res.json(data))
+            .catch((err) => {
+              res.status(500).json({
+                status: "Delete task failed",
+              });
+            });
+        });
+    });
   }
 }
 
