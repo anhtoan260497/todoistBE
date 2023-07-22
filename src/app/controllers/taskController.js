@@ -16,7 +16,7 @@ class TaskController {
     const email = user._id;
     taskModel
       .findOne({ email })
-      .then((data) => res.json(data.toObject()))
+      .then((data) => res.json(data))
       .catch((err) => {
         res.status(500).json({
           message: "Server Error",
@@ -49,7 +49,7 @@ class TaskController {
           taskModel
             .findOne({ email })
             .then((data) => res.json(data))
-            .catch((err) => res.status(500).json("Server Error"))
+            .catch((err) => res.status(500).json("Server Error"));
         });
     });
   }
@@ -97,6 +97,8 @@ class TaskController {
         const currentDay = getTime(now);
         const allProjects = data.projects.map((item) => [...item.tasks]);
         const allTasks = allProjects.flat(1); // merge all nested array to single array
+        allTasks.sort((item1, item2) => item1.date - item2.date);
+        console.log(allTasks);
         const todayTask = allTasks.filter((item) => {
           const taskDate = getTime(item.date);
           if (
