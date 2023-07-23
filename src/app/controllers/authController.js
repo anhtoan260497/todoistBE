@@ -86,7 +86,6 @@ class AuthController {
   login(req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
-    console.log(email, typeof password);
     accountModel
       .findOne({
         email,
@@ -105,7 +104,6 @@ class AuthController {
           });
           return;
         }
-        console.log(data);
         res.status(400).json({
           loggedIn: false,
           status: "Wrong username or password",
