@@ -64,11 +64,12 @@ class TaskController {
         loggedIn: false,
       });
     const email = user._id;
+    const projects = req.body.projects
     taskModel
       .updateOne(
         { email },
         {
-          projects: req.body.projects,
+          projects,
         }
       )
       .then(() => {
