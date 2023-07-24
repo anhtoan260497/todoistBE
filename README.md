@@ -1,9 +1,20 @@
-# Backend Todoist 
+# 1. Backend Todoist 
 
-## Source Code URL 
+- [1. Backend Todoist](#1-backend-todoist)
+  - [1.1. Source Code URL](#11-source-code-url)
+  - [1.2. Production URL](#12-production-url)
+- [2. How to use](#2-how-to-use)
+  - [2.1. BaseURL](#21-baseurl)
+    - [2.1.1. Auth API](#211-auth-api)
+    - [2.1.2. Task API](#212-task-api)
+    - [2.1.3. Project API](#213-project-api)
+- [3. Libraries Use](#3-libraries-use)
+
+
+## 1.1. Source Code URL 
 [Github Todoist Backend Source Code](https://github.com/anhtoan260497/todoistBE)
 
-## Production URL
+## 1.2. Production URL
 
 [Render Todoist Backend Production](https://todoist-be-6li5.onrender.com)
 
@@ -11,13 +22,13 @@
 
 >It's take about `30-45 seconds` to start a server
 
-# How to use
+# 2. How to use
 
-## BaseURL
+## 2.1. BaseURL
 
 `https://todoist-be-6li5.onrender.com/api/`
 
-### Auth API
+### 2.1.1. Auth API
 
 > ### Sign Up
 > 
@@ -39,7 +50,7 @@
 > **Body** : ```{token}``` <br>
 > ***Response*** : `New Token`
 
-### Task API
+### 2.1.2. Task API
 
 > ### Get All Task 
 > **URL** :  https://todoist-be-6li5.onrender.com/api/task/ <br>
@@ -89,7 +100,7 @@
 > **Body** : `{_id, project, subtask}` <br>
 > ***Response*** : `Data {email, projects}` 
 
-### Project API
+### 2.1.3. Project API
 
 > ### Get All Project
 > **URL** :  https://todoist-be-6li5.onrender.com/api/project/ <br>
@@ -121,7 +132,7 @@
 > **Body** : `{project}` <br>
 > ***Response*** : `Data {email, projects}` 
 
-# Libraries Use
+# 3. Libraries Use
 
 - Nodejs
 - Express
